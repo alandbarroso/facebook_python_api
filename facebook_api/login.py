@@ -48,7 +48,7 @@ class FacebookLoginAPI(FacebookCoreAPI):
 
 		self.logger.info('Sending code to facebook.')
 
-		response = self.login_get(url=self._TOKEN_URI, params=params, token_required=False)
+		status, response = self.login_get(url=self._TOKEN_URI, params=params)
 		self.logger.info('Access token adquired.')
 		access_token = response.split('=')[1] # Response in the form access_token=XXXXXXX
 
@@ -66,6 +66,6 @@ class FacebookLoginAPI(FacebookCoreAPI):
 
 		self.logger.info('Extending the token duration.')
 
-		response = self.login_get(url=self._TOKEN_URI, params=params, token_required=False)
+		status, response = self.login_get(url=self._TOKEN_URI, params=params)
 		
 		self.logger.info('Access token extended.')

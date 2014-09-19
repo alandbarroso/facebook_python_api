@@ -1,8 +1,5 @@
 from facebook_api.core import FacebookCoreAPI
 
-# To read facebook responses
-import json
-
 # For logging purposes
 import logging
 
@@ -100,9 +97,9 @@ class FacebookAdsReportingAPI(FacebookCoreAPI):
 
 		if actions_group_by:
 			if type(actions_group_by) == list or type(actions_group_by) == tuple:
-				report_params['actions_group_by'] = '[' + ','.join(actions_group_by) + ']'
+				report_params['actions_group_by'] = '[' + ','.join(['"' + column + '"' for column in actions_group_by]) + ']'
 			else:
-				report_params['actions_group_by'] = '[' + actions_group_by + ']'
+				report_params['actions_group_by'] = '["' + actions_group_by + '""]'
 
 		if sort_by:
 			report_params['sort_by'] = sort_by
