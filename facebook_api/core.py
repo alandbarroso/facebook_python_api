@@ -5,6 +5,9 @@ from facebook_api.exceptions import MissingTokenException, ExpiredTokenException
 from httplib2 import Http
 from urllib import urlencode
 
+# Libs to deal with http requests
+import requests
+
 # For dates and times
 from datetime import datetime, timedelta
 
@@ -43,15 +46,15 @@ class FacebookCoreAPI(object):
 
 		self.access_token = access_token
 
-	def validate_response(self, status, response):
+	def validate_response(self, status_code, response):
 		self.debug_logger.debug('Message Received:')
 		self.debug_logger.debug('Status')
-		self.debug_logger.debug(status)
+		self.debug_logger.debug(status_code)
 		self.debug_logger.debug('Response')
 		self.debug_logger.debug(response)
 
-		if status['status'] in ['200']:
-			return status, response
+		if status_code == requests.codes.ok:
+			return status_code, response
 		else:
 			content = json.loads(response)
 			error_message = content['error']['message']
@@ -59,30 +62,17 @@ class FacebookCoreAPI(object):
 			raise Exception(error_message)
 
 	def login_get(self, url, params={}):
-		if params:
-			encoded_params = urlencode(params)
+		r = requests.get(url, params=params)
 
-			d = {
-				'url':url,
-				'params':encoded_params
-			}
+		status_code = r.status_code
+		response = r.text
 
-			if '?' in url:
-				request_url = "%(url)s&%(params)s" % d
-			else:
-				request_url = "%(url)s?%(params)s" % d
-		else:
-			request_url = url
-
-		self.debug_logger.debug(request_url)
-
-		status, response = self.http.request(request_url, method='GET')
 		try:
-			status, response = self.validate_response(status, response)
+			status_code, response = self.validate_response(status_code, response)
 		except:
 			raise
 
-		return status, response
+		return status_code, response
 
 	def get(self, url, params={}):
 		try:
@@ -92,32 +82,18 @@ class FacebookCoreAPI(object):
 
 		params.update({'access_token':self.access_token})
 
-		if params:
-			encoded_params = urlencode(params)
+		r = requests.get(url, params=params)
 
-			d = {
-				'url':url,
-				'params':encoded_params
-			}
-
-			if '?' in url:
-				request_url = "%(url)s&%(params)s" % d
-			else:
-				request_url = "%(url)s?%(params)s" % d
-		else:
-			request_url = url
-
-		self.debug_logger.debug(request_url)
-
-		status, response = self.http.request(request_url, method='GET')
+		status_code = r.status_code
+		response = r.text
 		try:
-			status, response = self.validate_response(status, response)
+			status_code, response = self.validate_response(status_code, response)
 		except:
 			raise
 
 		return json.loads(response)
 
-	def post(self, url, params={}):
+	def post(self, url, params={}, files={}):
 		try:
 			self.load_access_token()
 		except:
@@ -125,13 +101,12 @@ class FacebookCoreAPI(object):
 
 		params.update({'access_token':self.access_token})
 
-		encoded_params = urlencode(params)
-		
-		self.debug_logger.debug(url)
+		r = requests.post(url, data=params, files=files)
 
-		status, response = self.http.request(url, method='POST', body=encoded_params)
+		status_code = r.status_code
+		response = r.text		
 		try:
-			status, response = self.validate_response(status, response)
+			status_code, response = self.validate_response(status_code, response)
 		except:
 			raise
 
@@ -145,13 +120,12 @@ class FacebookCoreAPI(object):
 
 		params.update({'access_token':self.access_token})
 
-		encoded_params = urlencode(params)
-		
-		self.debug_logger.debug(url)
+		r = requests.delete(url, data=params)
 
-		status, response = self.http.request(url, method='DELETE', body=encoded_params)
+		status_code = r.status_code
+		response = r.text
 		try:
-			status, response = self.validate_response(status, response)
+			status_code, response = self.validate_response(status_code, response)
 		except:
 			raise
 
@@ -165,11 +139,10 @@ class FacebookCoreAPI(object):
 
 		params.update({'access_token':self.access_token})
 
-		encoded_params = urlencode(params)
-		
-		self.debug_logger.debug(url)
+		r = requests.put(url, data=params)
 
-		status, response = self.http.request(url, method='PUT', body=encoded_params)
+		status_code = r.status_code
+		response = r.text
 		try:
 			status, response = self.validate_response(status, response)
 		except:
