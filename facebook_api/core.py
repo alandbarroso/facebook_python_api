@@ -41,9 +41,6 @@ class FacebookCoreAPI(object):
 
 		today = datetime.today()
 
-		if today - timedelta(59) > token_date:
-			raise ExpiredTokenException()
-
 		self.access_token = access_token
 
 	def validate_response(self, status_code, response):
@@ -149,11 +146,6 @@ class FacebookCoreAPI(object):
 			raise
 
 		return json.loads(response)
-
-	def renew_token(self):
-		self.get(self._RENEW_URI)
-
-		self.storage.save(self.access_token)
 
 # Abstract class of storage 
 class AbstractCredentialsStorage(object):
