@@ -10,5 +10,6 @@ setup(name='facebook_api',
       packages=['facebook_api', 'facebook_api.ads'],
       install_requires=[
           'httplib2',
+          'requests'
       ],
       zip_safe=False)
